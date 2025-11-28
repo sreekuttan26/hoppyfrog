@@ -38,7 +38,7 @@ const SPECIAL_CELLS: Record<number, cells> = {
         image: "/8.png",
         penalty: "Species compete for resources when sharing the same space. Some avoid competition by changing activity or shifting to different resources.",
         message: "frog got hungry from Competition! Go back to start",
-        moveBonus: -8
+        moveBonus: -7
     },
 
     12: {
@@ -54,7 +54,7 @@ const SPECIAL_CELLS: Record<number, cells> = {
         image: "/19.png",
         penalty: "Linear obstacles such as roads, railways, and power lines can impede animal migration, posing a threat to slower species like amphibians and affecting vegetation. Females carrying eggs are especially vulnerable, which can have repercussions for future generations.",
         message: "frog could not cross the road! Going back to Start",
-        moveBonus: -19
+        moveBonus: -18
     },
 
     26: {
@@ -86,7 +86,7 @@ const SPECIAL_CELLS: Record<number, cells> = {
         image: "/38.png",
         penalty: "Urbanisation alters ecosystems by clearing lakes and forests, impacting amphibians unable to move freely.",
         message: "frog could not move through the city! Going back one step",
-        moveBonus: -37
+        moveBonus: -1
     },
 
     39: {
@@ -110,7 +110,7 @@ const SPECIAL_CELLS: Record<number, cells> = {
         image: "/50.png",
         penalty: "Amphibians are vital in the food chain. Bats prey on frogs using echolocation. Male frogs are particularly vulnerable to bat predation while vocalising in the open.",
         message: "frog encountered a bat! Going back one step",
-        moveBonus: -49
+        moveBonus: -1
     },
 
     57: {
@@ -230,7 +230,7 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
 
     const [diceimg, Setdiceimg] = useState("/dice_3.gif")
 
-    const [scores, Setscores] = useState<number[]>([90, 94, 90, 92])
+    const [scores, Setscores] = useState<number[]>([0, 0, 0, 0])
 
     const [currentplayerindex, Setcurrentplayerindex] = useState<number>(0)
 
@@ -245,6 +245,8 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
     const [popupOkHandler, setPopupOkHandler] = useState<() => void>(() => { });
 
     const [showresult, Setshowresult] = useState(false)
+
+   
 
     const updatemessages = (player: string, heading: string, message: string) => {
         setMessages(prev => [
@@ -284,7 +286,8 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
         Setdiceimg(`/dice.gif`)
         const dicevalue = Math.floor(Math.random() * 6) + 1;
         Setcurrentdicevalue(dicevalue)
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        playdice()
+        await new Promise((resolve) => setTimeout(resolve, 3010));
 
 
 
@@ -301,12 +304,20 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
             updatecurrentplayer();
 
         }
+        
+
+        const heading0 = SPECIAL_CELLS[newscore]?.penalty ? 'Penality' : 'Benefit'
+            const player_0 = cleanedplayerlist[currentplayerindex] + " @ " + scores[currentplayerindex];
+
+
+           
 
 
 
         if (newscore > 100) {
             // alert("score more than 100")
             Setisrolling(false)
+             updatemessages(player_0, heading0, "Can not move over 100")
             updatecurrentplayer();
 
             return
@@ -339,6 +350,8 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
                 ?? SPECIAL_CELLS[currentplayerscore]?.benefit
                 ?? ""
             );
+
+            playwindow();
             await waitForPopup();
 
            
@@ -367,7 +380,7 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
                 }
             } else {
                 // Move backward
-                if (bonus * (-1) > 90) {
+                if (bonus * (-1) > 10) {
                     playlose()
                 }
 
@@ -404,7 +417,9 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
 
         Setcurrentplayerindex((prev) => {
             let next = prev;
-            const n = cleanedplayerlist.length;
+            const n = cleanedplayerlist.length;         
+
+           
 
             // Loop until we find a player whose score is not 100
             do {
@@ -446,10 +461,22 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
         sound.play();
 
     }
+    const playdice = () => {
+        const sound = new Audio('/mp3/dice.mp3');
+        sound.currentTime = 0;  // restart from the beginning
+        sound.play();
+
+    }
+    const playwindow = () => {
+        const sound = new Audio('/mp3/window.mp3');
+        sound.currentTime = 0;  // restart from the beginning
+        sound.play();
+
+    }
 
 
     return (
-        <div className="w-full h-full flex ">
+        <div className="w-full h-full flex flex-col md:flex-row">
             <div className='w-full h-full flex gap-2  md:h-[95vh] md:w-2/3 mx-2'>
                 <div className={`w-full  flex ${conatainerstyle} p-2 items-end flex-wrap-reverse`}>
                     {Array.from({ length: 100 }, (_, i) => {
@@ -479,14 +506,21 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
                             >
                                 {cellNumber}
                                 <div className='flex flex-wrap w-full h-full items-end gap-2'>
+                                    
 
-                                    <img src='/frog-0.png' className={` ${scores[0] === (cellNumber) ? 'flex ' : 'hidden'} ${currentplayerindex == 0 ? "bg-white animate-bounce" : 'bg-gray-500'}  w-8 h-8  p-1 ring-amber-300 ring-2  duration-75 rounded-full object-conatin`} />
+                                    <img src='/frog-0.png' className={` ${scores[0] === (cellNumber) ? 'flex ' : 'hidden'} ${currentplayerindex == 0 ? "md:bg-white animate-bounce md:w-2/4 " : 'md:bg-gray-500 md:w-1/4 '}    md:p-1  md:ring-amber-300 md:ring-1  duration-75 md:rounded-full .d:object-conatin`} />
 
-                                    <img src='/frog-1.png' className={` ${scores[1] === (cellNumber) ? 'flex ' : 'hidden'} ${currentplayerindex == 1 ? "bg-white animate-bounce" : 'bg-gray-500'}  w-8 h-8  p-1 ring-amber-300 ring-2  duration-75 rounded-full object-conatin`} />
+                                    <img src='/frog-1.png' className={` ${scores[1] === (cellNumber) ? 'flex ' : 'hidden'} ${currentplayerindex == 1 ? "md:bg-white animate-bounce md:w-2/4 " : 'md:bg-gray-500 md:w-1/4 '}    md:p-1  md:ring-amber-300 md:ring-1  duration-75 md:rounded-full .d:object-conatin`} />
 
-                                    <img src='/frog-2.png' className={` ${scores[2] === (cellNumber) ? 'flex' : 'hidden'} ${currentplayerindex == 2 ? "bg-white animate-bounce" : 'bg-gray-500'} w-8 h-8  p-1 ring-amber-300 ring-2  duration-75 rounded-full object-conatin`} />
+                                    <img src='/frog-2.png' className={` ${scores[2] === (cellNumber) ? 'flex ' : 'hidden'} ${currentplayerindex == 2 ? "md:bg-white animate-bounce md:w-2/4 " : 'md:bg-gray-500 md:w-1/4 '}    md:p-1  md:ring-amber-300 md:ring-1  duration-75 md:rounded-full .d:object-conatin`} />
 
-                                    <img src='/frog-3.png' className={` ${scores[3] === (cellNumber) ? 'flex ' : 'hidden'} ${currentplayerindex == 3 ? "bg-white animate-bounce" : 'bg-gray-500'}  w-8 h-8  p-1 ring-amber-300 ring-2  duration-75 rounded-full object-conatin`} />
+                                    <img src='/frog-3.png' className={` ${scores[3] === (cellNumber) ? 'flex ' : 'hidden'} ${currentplayerindex == 3 ? "md:bg-white animate-bounce md:w-2/4 " : 'md:bg-gray-500 md:w-1/4 '}    md:p-1  md:ring-amber-300 md:ring-1  duration-75 md:rounded-full .d:object-conatin`} />
+
+                                    {/* <img src='/frog-1.png' className={` ${scores[1] === (cellNumber) ? 'flex ' : 'hidden'} ${currentplayerindex == 1 ? "bg-white animate-bounce" : 'bg-gray-500'}  w-1/5   p-1 ring-amber-300 ring-1  duration-75 rounded-full object-conatin`} />
+
+                                    <img src='/frog-2.png' className={` ${scores[2] === (cellNumber) ? 'flex' : 'hidden'} ${currentplayerindex == 2 ? "bg-white animate-bounce" : 'bg-gray-500'}  w-1/5  p-1 ring-amber-300 ring-1  duration-75 rounded-full object-conatin`} />
+
+                                    <img src='/frog-3.png' className={` ${scores[3] === (cellNumber) ? 'flex ' : 'hidden'} ${currentplayerindex == 3 ? "bg-white animate-bounce" : 'bg-gray-500'}   w-1/5   p-1 ring-amber-300 ring-1  duration-75 rounded-full object-conatin`} /> */}
                                 </div>
                             </div>
                         );
@@ -573,7 +607,7 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
                             <div className={`${showresult ? 'flex flex-col' : 'hidden'}  w-full  gap-2 items-center justify-center`}>
 
                                 <p className="font-semibold border-2 p-2 bg-[#d1b07e] uppercase text-center rounded-xl animate-bounce">{alertmessage}</p>
-                                <button className='p-2 px-4 bg-[#be7b17] text-white rounded-xl animate-bounce m-5' onClick={popupOkHandler}>OK</button>
+                                <button className='p-2 px-4 bg-[#be7b17] text-white rounded-xl  m-5' onClick={popupOkHandler}>OK</button>
                             </div>
                         </div>
                     </div>
