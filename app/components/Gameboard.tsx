@@ -17,10 +17,10 @@ interface cells {
     moveBonus: number;
     message: string;
 }
-interface messages{
-    player:string;
-    heading:string;
-    message:string;
+interface messages {
+    player: string;
+    heading: string;
+    message: string;
 }
 
 const SPECIAL_CELLS: Record<number, cells> = {
@@ -226,7 +226,7 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
     const cleanedplayerlist = entroledplayers.filter(item => item !== "");
     const [isrolling, Setisrolling] = useState(false)
 
-  const [messages, setMessages] = useState<messages[]>([]);
+    const [messages, setMessages] = useState<messages[]>([]);
 
     const [diceimg, Setdiceimg] = useState("/dice_3.gif")
 
@@ -246,11 +246,11 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
 
     const [showresult, Setshowresult] = useState(false)
 
-     const updatemessages =(player:string, heading:string,message:string)=>{
+    const updatemessages = (player: string, heading: string, message: string) => {
         setMessages(prev => [
-    ...prev,
-    { player: player, heading: heading, message: message }
-]);
+            ...prev,
+            { player: player, heading: heading, message: message }
+        ]);
     }
 
 
@@ -330,6 +330,8 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
 
         if (SPECIAL_CELLS[currentplayerscore]) {
             const bonus = SPECIAL_CELLS[currentplayerscore].moveBonus;
+
+            const currentmesasge=SPECIAL_CELLS[currentplayerscore] ? SPECIAL_CELLS[currentplayerscore].message : "";
             Setalertmessage(SPECIAL_CELLS[currentplayerscore] ? SPECIAL_CELLS[currentplayerscore].message : "")
             setalertimg(SPECIAL_CELLS[currentplayerscore] ? SPECIAL_CELLS[currentplayerscore].image : "")
             Setalertdesc(
@@ -339,12 +341,14 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
             );
             await waitForPopup();
 
-            const player_=cleanedplayerlist[currentplayerindex]
-            const heading=SPECIAL_CELLS[currentplayerscore]?.penalty?'Penality':'Benefit'
+           
+            const heading = SPECIAL_CELLS[currentplayerscore]?.penalty ? 'Penality' : 'Benefit'
+            const player_ = cleanedplayerlist[currentplayerindex] + " @ " + scores[currentplayerindex];
 
-            updatemessages(player_,heading, alertmessage)
 
-            
+            updatemessages(player_, heading, currentmesasge)
+
+
 
             if (bonus > 0) {
                 // Move forward
@@ -422,7 +426,7 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
 
     }, [scores])
 
-   
+
 
     const playfrogcall = () => {
         const sound = new Audio('/mp3/frog.mp3');
@@ -542,13 +546,13 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
                     <h1 className="text-xl font-semibold">Messages</h1>
                     <div className="w-full flex flex-col gap-4">
 
-                       {[...messages].reverse().map((item, i) => (
-    <div key={i} className="border-b-2 py-4">
-        <h1 className="font-semibold">{item.heading}</h1>
-        <p className="text-sm">{item.message}</p>
-        <p className="text-xs opacity-70">By: {item.player}</p>
-    </div>
-))}
+                        {[...messages].reverse().map((item, i) => (
+                            <div key={i} className="border-b-2 py-4">
+                                <h1 className="font-semibold">{item.player}</h1>
+                                <p className="text-sm">{item.message}</p>
+                                <p className="text-xs opacity-70"></p>
+                            </div>
+                        ))}
 
                     </div>
                 </div>

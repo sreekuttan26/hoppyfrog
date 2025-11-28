@@ -6,12 +6,13 @@ import Infoscreen from "./components/Infoscreen";
 import Entrol from "./components/Entrol";
 import Gameboard from "./components/Gameboard";
 import CustomAlert from "./components/CustomAlert";
+import Welcome from "./components/Welcome";
 
 export default function Home() {
 
   const conatainerstyle = 'border-4 border-[#be7b17] rounded-xl bg-[#eccb98]'
 
-  const [currentscreen, Setcurrentscreen] = useState('intro')
+  const [currentscreen, Setcurrentscreen] = useState('welcome')
   const [playernames, Setplayernames] = useState<string[]>(["", "", "", "", ""])
 
   
@@ -33,6 +34,11 @@ export default function Home() {
     <main className='w-full h-full min-h-screen relative bg-[url(/bg-forest.jpg)] bg-cover p-2'>
       {/* info */}
       <div className='w-full h-screen flex items-center justify-center overflow-hidden '>
+        {currentscreen === 'welcome' && (
+          <Welcome changescreen={changescreen} />
+
+        )}
+
         {currentscreen === 'intro' && (
           <Infoscreen changescreen={changescreen} />
 
