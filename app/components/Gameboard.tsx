@@ -543,6 +543,7 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
 
             <div className={`${conatainerstyle} md:w-1/3 md:h-[95vh] flex flex-col gap-5 items-center p-4`}>
                 <h1 className="w-auto text-2xl font-semibold">Hoppy Frog Game</h1>
+                
                 <div className=' bg-orange-100 rounded-xl p-4 w-full flex flex-col items-center gap-2 '>
                     <img
                         src={diceimg}
@@ -590,6 +591,7 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
 
                     </div>
                 </div>
+                <p>Developed by ATREE Communications</p>
             </div>
 
             {showPopup && (
