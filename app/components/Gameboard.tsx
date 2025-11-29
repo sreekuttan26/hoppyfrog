@@ -464,7 +464,7 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
         //[0, 0, 0, 0]
         let tempscorearry:number[]=[]
         Array.from({length:entroledplayers.length},(_,i)=>{
-            tempscorearry.push(90)
+            tempscorearry.push(0)
            
         })
         Setscores(tempscorearry)
