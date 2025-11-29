@@ -230,7 +230,7 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
 
     const [diceimg, Setdiceimg] = useState("/dice_3.gif")
 
-    const [scores, Setscores] = useState<number[]>([0, 0, 0, 0])
+    const [scores, Setscores] = useState<number[]>([0])
 
     const [currentplayerindex, Setcurrentplayerindex] = useState<number>(0)
 
@@ -245,6 +245,10 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
     const [popupOkHandler, setPopupOkHandler] = useState<() => void>(() => { });
 
     const [showresult, Setshowresult] = useState(false)
+
+    const[popuptext, Setpopuptext]=useState("OK")
+
+    const [showreload, Setshowreload]=useState(false)
 
    
 
@@ -342,6 +346,8 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
         if (SPECIAL_CELLS[currentplayerscore]) {
             const bonus = SPECIAL_CELLS[currentplayerscore].moveBonus;
 
+           
+
             const currentmesasge=SPECIAL_CELLS[currentplayerscore] ? SPECIAL_CELLS[currentplayerscore].message : "";
             Setalertmessage(SPECIAL_CELLS[currentplayerscore] ? SPECIAL_CELLS[currentplayerscore].message : "")
             setalertimg(SPECIAL_CELLS[currentplayerscore] ? SPECIAL_CELLS[currentplayerscore].image : "")
@@ -349,7 +355,12 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
                 SPECIAL_CELLS[currentplayerscore]?.penalty
                 ?? SPECIAL_CELLS[currentplayerscore]?.benefit
                 ?? ""
-            );
+            ); 
+            
+            if(bonus>0){
+                 Setalertdesc('Game Over for' +cleanedplayerlist[currentplayerindex])
+                
+            }
 
             playwindow();
             await waitForPopup();
@@ -413,7 +424,26 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
 
 
     }
-    const updatecurrentplayer = () => {
+    const reload=()=>{
+        window.location.reload();
+    }
+
+
+    const updatecurrentplayer = async () => {
+
+        console.log("scores: "+scores)
+        if(scores.every(score => score === 100)){
+            setPopupOkHandler(() => reload);
+            Setpopuptext('Restart')
+            Setalertmessage('Game Over')
+            setalertimg('/100.png')
+            Setalertdesc('All players finished the game.')
+            Setshowreload(true)
+            await waitForPopup();
+
+            return;
+        }
+
 
         Setcurrentplayerindex((prev) => {
             let next = prev;
@@ -430,11 +460,23 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
         });
 
     }
+    useEffect(()=>{
+        //[0, 0, 0, 0]
+        let tempscorearry:number[]=[]
+        Array.from({length:entroledplayers.length},(_,i)=>{
+            tempscorearry.push(90)
+           
+        })
+        Setscores(tempscorearry)
+
+
+    },[])
 
     useEffect(() => {
         if (scores[currentplayerindex] === 100) {
             playwin();
         }
+        
 
 
 
@@ -604,12 +646,17 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
                             src={alertimg} className='h-[200px] object-conatin' />
                         <div className='flex flex-col gap-2 '>
                             <p className="font-semibold text-center">{alertdesc}</p>
-                            <button onClick={() => { Setshowresult(true) }} className={`p-2 bg-[#be7b17] text-white rounded-xl animate-bounce m-5  ${showresult ? 'hidden' : 'flex flex-col'}`}>Check what happend</button>
+                            <button onClick={() => { Setshowresult(true) }} className={`p-2 bg-[#be7b17] text-white rounded-xl animate-bounce m-5 ${showreload?'hidden':'flex'}  ${showresult ? 'hidden' : 'flex flex-col'}`}>Check what happend</button>
 
                             <div className={`${showresult ? 'flex flex-col' : 'hidden'}  w-full  gap-2 items-center justify-center`}>
 
                                 <p className="font-semibold border-2 p-2 bg-[#d1b07e] uppercase text-center rounded-xl animate-bounce">{alertmessage}</p>
-                                <button className='p-2 px-4 bg-[#be7b17] text-white rounded-xl  m-5' onClick={popupOkHandler}>OK</button>
+                                <button className={` ${showreload?'hidden':'flex'}  p-2 px-4 bg-[#be7b17] text-white rounded-xl  m-5`} onClick={popupOkHandler}>{popuptext}</button>
+                               
+                            </div>
+
+                            <div className={`${showreload?'flex flex-col':'hidden'}  w-full  gap-2 items-center justify-center`}>
+                                 <button className={` p-2 px-4 bg-[#be7b17] text-white rounded-xl  m-5`} onClick={reload}>{popuptext}</button>
                             </div>
                         </div>
                     </div>

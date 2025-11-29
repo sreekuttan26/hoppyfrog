@@ -9,7 +9,7 @@ type probs = {
 
 const Entrol = ({ changescreen, entrolplayers }: probs) => {
     const [numberofplayers, Setnumberofplayers]=useState(2)
-    const[playernames, Setplayernames]=useState<string[]>(["", "", "", "", ""])
+    const[playernames, Setplayernames]=useState<string[]>(["","","",""])
     const[isplayersentroled, Setisplayersentrolled]=useState(false)
 
     const opengameboard=()=>{
@@ -35,12 +35,39 @@ const Entrol = ({ changescreen, entrolplayers }: probs) => {
 
 
     }
+    useEffect(() => {
+    Setplayernames(prev => {
+        const updated = [...prev];
+
+        // Add missing fields
+        while (updated.length < numberofplayers) {
+            updated.push("");
+        }
+
+        // Remove extra fields
+        if (updated.length > numberofplayers) {
+            updated.length = numberofplayers;
+        }
+
+        return updated;
+    });
+}, [numberofplayers]);
 
 
-    useEffect(()=>{
+
+    // useEffect(()=>{
+    //      Setplayernames(["",""])
+    //     const tempplayers:string[]=[];
+
+    //     Array.from({length:numberofplayers},(_,i)=>{
+    //         tempplayers.push("")
+    //     })
+    //     Setplayernames(tempplayers)
 
 
-    },[])
+
+
+    // },[numberofplayers])
 
 
     return (
@@ -63,7 +90,7 @@ const Entrol = ({ changescreen, entrolplayers }: probs) => {
                                             idx === i ? e.target.value : name
                                         )
                                     );}}
-               className='p-2 border-2 rounded-xl bg-orange-200' placeholder={`Enter name of player ${i+1}`}></input>
+               className='p-2 border-2 rounded-xl bg-orange-200' placeholder={`Enter name of player ${i+1} `} value={playernames[i] || ""} ></input>
                 
                 
               ))}
