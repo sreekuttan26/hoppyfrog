@@ -601,7 +601,7 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
 
                 <div className='w-full flex gap-2 items-center justify-center'>
                     {cleanedplayerlist.map((player, i) => (
-                        player.length > 1 &&
+                        player.length > 0 &&
                         <div key={i} className={`p-4 rounded-xl text-sm border-2 ${cleanedplayerlist[currentplayerindex] === player ? 'bg-yellow-300' : ''} `}>
                             <div className='flex flex-col gap-2 items-center font-semibold'>
                                 {player}
