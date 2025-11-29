@@ -357,7 +357,7 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
                 ?? ""
             ); 
             
-            if(bonus>0){
+            if(bonus===0){
                  Setalertdesc('Game Over for' +cleanedplayerlist[currentplayerindex])
                 
             }
