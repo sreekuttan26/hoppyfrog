@@ -69,8 +69,8 @@ const SPECIAL_CELLS: Record<number, cells> = {
         type: 'green',
         image: "/27.png",
         benefit: "Rainfall increases amphibian activity as they search for breeding habitats. Flowing water facilitates tadpole dispersal between habitats.",
-        message: "frog has FOUND A STREAM! Promoted to 39",
-        moveBonus: 12
+        message: "frog has FOUND A STREAM! Promoted to 40",
+        moveBonus: 13
     },
 
     33: {
