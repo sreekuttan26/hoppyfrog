@@ -292,8 +292,8 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
         }
         Setisrolling(true)
         Setdiceimg(`/dice.gif`)
-         //const dicevalue = Math.floor(Math.random() * 6) + 1;
-        const dicevalue = 1;
+         const dicevalue = Math.floor(Math.random() * 6) + 1;
+       // const dicevalue = 1;
         Setcurrentdicevalue(dicevalue)
         playdice()
         await new Promise((resolve) => setTimeout(resolve, 3010));
@@ -483,7 +483,7 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
         //[0, 0, 0, 0]
         let tempscorearry: number[] = []
         Array.from({ length: entroledplayers.length }, (_, i) => {
-            tempscorearry.push(99)
+            tempscorearry.push(0)
 
         })
         Setscores(tempscorearry)
