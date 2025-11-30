@@ -7,6 +7,7 @@ import Entrol from "./components/Entrol";
 import Gameboard from "./components/Gameboard";
 import CustomAlert from "./components/CustomAlert";
 import Welcome from "./components/Welcome";
+import BreakpointDisplay from "./components/Breakpointsipay";
 
 export default function Home() {
 
@@ -33,7 +34,11 @@ export default function Home() {
   return (
     <main className='w-full h-full min-h-screen relative bg-[url(/bg-forest.jpg)] bg-cover p-2'>
       {/* info */}
-      <div className='w-full h-screen flex items-center justify-center overflow-hidden '>
+      <BreakpointDisplay/>
+
+
+
+      <div className='w-full h-screen flex items-center justify-center overflow-x-hidden '>
         {currentscreen === 'welcome' && (
           <Welcome changescreen={changescreen} />
 

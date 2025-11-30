@@ -8,50 +8,57 @@ type probs = {
 }
 
 const Entrol = ({ changescreen, entrolplayers }: probs) => {
-    const [numberofplayers, Setnumberofplayers]=useState(2)
-    const[playernames, Setplayernames]=useState<string[]>(["","","",""])
-    const[isplayersentroled, Setisplayersentrolled]=useState(false)
+    const [numberofplayers, Setnumberofplayers] = useState(2)
+    const [playernames, Setplayernames] = useState<string[]>(["", "", "", ""])
+    const [isplayersentroled, Setisplayersentrolled] = useState(false)
 
-    const opengameboard=()=>{
-        playernames.map((player,i)=>{
-            if(i<numberofplayers){
-                if(player.length<1){
-                     Setisplayersentrolled(false)
-                    alert('player list ')
-                    
-                    return;
-                }else{
-                    Setisplayersentrolled(true)
+    const opengameboard = () => {
+        const validPlayers = playernames.slice(0, numberofplayers);
 
-                }
-            }
-        })
-
-        if(isplayersentroled){
-              changescreen('game')
-        entrolplayers(playernames)
+        // 1. Check empty names
+        if (validPlayers.some(name => name.trim().length === 0)) {
+            Setisplayersentrolled(false);
+            alert('Please fill in all player names.');
+            return;
         }
-      
+
+        // 2. Check duplicates
+        const hasDuplicates = new Set(validPlayers).size !== validPlayers.length;
+
+        if (hasDuplicates) {
+            Setisplayersentrolled(false);
+            alert('Duplicate names are not allowed.');
+            return;
+        }
+
+        // Passed both checks
+        Setisplayersentrolled(true);
+
+        if (isplayersentroled) {
+            changescreen('game')
+            entrolplayers(playernames)
+        }
+
 
 
     }
     useEffect(() => {
-    Setplayernames(prev => {
-        const updated = [...prev];
+        Setplayernames(prev => {
+            const updated = [...prev];
 
-        // Add missing fields
-        while (updated.length < numberofplayers) {
-            updated.push("");
-        }
+            // Add missing fields
+            while (updated.length < numberofplayers) {
+                updated.push("");
+            }
 
-        // Remove extra fields
-        if (updated.length > numberofplayers) {
-            updated.length = numberofplayers;
-        }
+            // Remove extra fields
+            if (updated.length > numberofplayers) {
+                updated.length = numberofplayers;
+            }
 
-        return updated;
-    });
-}, [numberofplayers]);
+            return updated;
+        });
+    }, [numberofplayers]);
 
 
 
@@ -75,27 +82,28 @@ const Entrol = ({ changescreen, entrolplayers }: probs) => {
             <h1 className='text-2xl font-bold '>Entrol Players </h1>
             <span>Select Number of Players </span>
             <div className="flex gap-2">
-              {Array.from({length:5},(_,i)=>(
-                i > 1 ? <div key={i} className="p-2 border-2 hover:bg-orange-100 cursor-pointer " onClick={()=>{Setnumberofplayers(i)}}>{i}</div> : null
-                
-                
-              ))}
+                {Array.from({ length: 5 }, (_, i) => (
+                    i > 1 ? <div key={i} className="p-2 border-2 hover:bg-orange-100 cursor-pointer " onClick={() => { Setnumberofplayers(i) }}>{i}</div> : null
+
+
+                ))}
             </div>
 
             <div className="flex gap-2 flex-col">
-              {Array.from({length:numberofplayers},(_,i)=>(
-               <input key={i}  onChange={(e) => {
-                                    Setplayernames(prev =>
-                                        prev.map((name, idx) =>
-                                            idx === i ? e.target.value : name
-                                        )
-                                    );}}
-               className='p-2 border-2 rounded-xl bg-orange-200' placeholder={`Enter name of player ${i+1} `} value={playernames[i] || ""} ></input>
-                
-                
-              ))}
+                {Array.from({ length: numberofplayers }, (_, i) => (
+                    <input key={i} onChange={(e) => {
+                        Setplayernames(prev =>
+                            prev.map((name, idx) =>
+                                idx === i ? e.target.value : name
+                            )
+                        );
+                    }}
+                        className='p-2 border-2 rounded-xl bg-orange-200' placeholder={`Enter name of player ${i + 1} `} value={playernames[i] || ""} ></input>
+
+
+                ))}
             </div>
-        
+
 
 
 

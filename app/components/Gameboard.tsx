@@ -213,7 +213,7 @@ const SPECIAL_CELLS: Record<number, cells> = {
         type: 'green',
         image: "/100.png",
         benefit: "Wow! you won",
-        message: "Game Over",
+        message: "Game Over for you. Lets wait for other frogs to finish.",
         moveBonus: 0
     }
 
@@ -246,11 +246,15 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
 
     const [showresult, Setshowresult] = useState(false)
 
-    const[popuptext, Setpopuptext]=useState("OK")
+    const [popuptext, Setpopuptext] = useState("OK")
 
-    const [showreload, Setshowreload]=useState(false)
+    const [showreload, Setshowreload] = useState(false)
 
-   
+    const [show_congratualtions, Setshow_congratualtions] = useState(false)
+
+    const [playerrank, Setplayerrank] = useState<string[]>([])
+
+
 
     const updatemessages = (player: string, heading: string, message: string) => {
         setMessages(prev => [
@@ -288,7 +292,8 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
         }
         Setisrolling(true)
         Setdiceimg(`/dice.gif`)
-        const dicevalue = Math.floor(Math.random() * 6) + 1;
+         //const dicevalue = Math.floor(Math.random() * 6) + 1;
+        const dicevalue = 1;
         Setcurrentdicevalue(dicevalue)
         playdice()
         await new Promise((resolve) => setTimeout(resolve, 3010));
@@ -300,28 +305,29 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
         const newscore = scores[currentplayerindex] + dicevalue;
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        if (newscore === 100) {
+        // if (newscore === 100) {
 
-            Setisrolling(false)
+        //     Setisrolling(false)
 
 
-            updatecurrentplayer();
 
-        }
-        
+        //     updatecurrentplayer();
+
+        // }
+
 
         const heading0 = SPECIAL_CELLS[newscore]?.penalty ? 'Penality' : 'Benefit'
-            const player_0 = cleanedplayerlist[currentplayerindex] + " @ " + scores[currentplayerindex];
+        const player_0 = cleanedplayerlist[currentplayerindex] + " @ " + scores[currentplayerindex];
 
 
-           
+
 
 
 
         if (newscore > 100) {
             // alert("score more than 100")
             Setisrolling(false)
-             updatemessages(player_0, heading0, "Can not move over 100")
+            updatemessages(player_0, heading0, "Can not move over 100")
             updatecurrentplayer();
 
             return
@@ -346,31 +352,42 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
         if (SPECIAL_CELLS[currentplayerscore]) {
             const bonus = SPECIAL_CELLS[currentplayerscore].moveBonus;
 
-           
 
-            const currentmesasge=SPECIAL_CELLS[currentplayerscore] ? SPECIAL_CELLS[currentplayerscore].message : "";
+
+            const currentmesasge = SPECIAL_CELLS[currentplayerscore] ? SPECIAL_CELLS[currentplayerscore].message : "";
             Setalertmessage(SPECIAL_CELLS[currentplayerscore] ? SPECIAL_CELLS[currentplayerscore].message : "")
             setalertimg(SPECIAL_CELLS[currentplayerscore] ? SPECIAL_CELLS[currentplayerscore].image : "")
             Setalertdesc(
                 SPECIAL_CELLS[currentplayerscore]?.penalty
                 ?? SPECIAL_CELLS[currentplayerscore]?.benefit
                 ?? ""
-            ); 
-            
-            if(bonus===0){
-                 Setalertdesc('Game Over for' +cleanedplayerlist[currentplayerindex])
-                
+            );
+
+            if (bonus === 0) {
+                Setalertdesc('Game Over for ' + cleanedplayerlist[currentplayerindex])
+                Setplayerrank(prev => {
+                    return [...prev, cleanedplayerlist[currentplayerindex]];
+                });
+
+
+
             }
 
             playwindow();
-            await waitForPopup();
 
-           
+            if (!show_congratualtions) {
+                await waitForPopup();
+            }
+
+
+
             const heading = SPECIAL_CELLS[currentplayerscore]?.penalty ? 'Penality' : 'Benefit'
             const player_ = cleanedplayerlist[currentplayerindex] + " @ " + scores[currentplayerindex];
 
 
             updatemessages(player_, heading, currentmesasge)
+
+            console.log("playerrank: " + playerrank)
 
 
 
@@ -424,32 +441,34 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
 
 
     }
-    const reload=()=>{
+    const reload = () => {
         window.location.reload();
     }
 
 
     const updatecurrentplayer = async () => {
 
-        console.log("scores: "+scores)
-        if(scores.every(score => score === 100)){
-            setPopupOkHandler(() => reload);
-            Setpopuptext('Restart')
-            Setalertmessage('Game Over')
-            setalertimg('/100.png')
-            Setalertdesc('All players finished the game.')
-            Setshowreload(true)
-            await waitForPopup();
+        console.log("scores: " + scores)
+        // if (scores.every(score => score === 100)) {
+        //     setPopupOkHandler(() => reload);
+        //     Setpopuptext('Restart')
+        //     Setalertmessage('Game Over')
+        //     setalertimg('/100.png')
+        //     Setalertdesc('All players finished the game.')
+        //     //Setshowreload(true)
+        //     // await waitForPopup();
+        //     Setshow_congratualtions(true)
+        //     play_congratularions()
 
-            return;
-        }
+        //     return;
+        // }
 
 
         Setcurrentplayerindex((prev) => {
             let next = prev;
-            const n = cleanedplayerlist.length;         
+            const n = cleanedplayerlist.length;
 
-           
+
 
             // Loop until we find a player whose score is not 100
             do {
@@ -460,23 +479,37 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
         });
 
     }
-    useEffect(()=>{
+    useEffect(() => {
         //[0, 0, 0, 0]
-        let tempscorearry:number[]=[]
-        Array.from({length:entroledplayers.length},(_,i)=>{
-            tempscorearry.push(0)
-           
+        let tempscorearry: number[] = []
+        Array.from({ length: entroledplayers.length }, (_, i) => {
+            tempscorearry.push(99)
+
         })
         Setscores(tempscorearry)
 
 
-    },[])
+    }, [])
 
     useEffect(() => {
+
+        if (scores.every(score => score === 100)) {
+            setPopupOkHandler(() => reload);
+            Setpopuptext('Restart')
+            Setalertmessage('Game Over')
+            setalertimg('/100.png')
+            Setalertdesc('All players finished the game.')
+            //Setshowreload(true)
+            // await waitForPopup();
+            Setshow_congratualtions(true)
+            play_congratularions()
+
+            return;
+        }
         if (scores[currentplayerindex] === 100) {
             playwin();
         }
-        
+
 
 
 
@@ -515,11 +548,18 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
         sound.play();
 
     }
+    const play_congratularions = () => {
+        const sound = new Audio('/mp3/congrats.mp3');
+        sound.currentTime = 0;  // restart from the beginning
+        sound.play();
+        sound.loop=true
+
+    }
 
 
     return (
-        <div className="w-full h-full flex flex-col md:flex-row">
-            <div className='w-full h-full flex gap-2  md:h-[95vh] md:w-2/3 mx-2'>
+        <div className="w-full h-full flex flex-col lg:flex-row ">
+            <div className='w-full h-[60vh] flex gap-2 shrink-0   md:h-[95vh] lg:w-2/3 mx-2'>
                 <div className={`w-full  flex ${conatainerstyle} p-2 items-end flex-wrap-reverse`}>
                     {Array.from({ length: 100 }, (_, i) => {
 
@@ -548,7 +588,7 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
                             >
                                 {cellNumber}
                                 <div className='flex flex-wrap w-full h-full items-end gap-2'>
-                                    
+
 
                                     <img src='/frog-0.png' className={` ${scores[0] === (cellNumber) ? 'flex ' : 'hidden'} ${currentplayerindex == 0 ? "md:bg-white animate-bounce md:w-2/4 " : 'md:bg-gray-500 md:w-1/4 '}    md:p-1  md:ring-amber-300 md:ring-1  duration-75 md:rounded-full .d:object-conatin`} />
 
@@ -558,11 +598,7 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
 
                                     <img src='/frog-3.png' className={` ${scores[3] === (cellNumber) ? 'flex ' : 'hidden'} ${currentplayerindex == 3 ? "md:bg-white animate-bounce md:w-2/4 " : 'md:bg-gray-500 md:w-1/4 '}    md:p-1  md:ring-amber-300 md:ring-1  duration-75 md:rounded-full .d:object-conatin`} />
 
-                                    {/* <img src='/frog-1.png' className={` ${scores[1] === (cellNumber) ? 'flex ' : 'hidden'} ${currentplayerindex == 1 ? "bg-white animate-bounce" : 'bg-gray-500'}  w-1/5   p-1 ring-amber-300 ring-1  duration-75 rounded-full object-conatin`} />
 
-                                    <img src='/frog-2.png' className={` ${scores[2] === (cellNumber) ? 'flex' : 'hidden'} ${currentplayerindex == 2 ? "bg-white animate-bounce" : 'bg-gray-500'}  w-1/5  p-1 ring-amber-300 ring-1  duration-75 rounded-full object-conatin`} />
-
-                                    <img src='/frog-3.png' className={` ${scores[3] === (cellNumber) ? 'flex ' : 'hidden'} ${currentplayerindex == 3 ? "bg-white animate-bounce" : 'bg-gray-500'}   w-1/5   p-1 ring-amber-300 ring-1  duration-75 rounded-full object-conatin`} /> */}
                                 </div>
                             </div>
                         );
@@ -581,11 +617,15 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
 
 
 
+            {/* control borad */}
 
+           
 
-            <div className={`${conatainerstyle} md:w-1/3 md:h-[95vh] flex flex-col gap-5 items-center p-4`}>
+            <div className={`${conatainerstyle} lg:w-1/3 lg:h-[95vh] flex flex-col gap-5 items-center p-4 w-full h-full  flex-shrink-0 `}>
                 <h1 className="w-auto text-2xl font-semibold">Hoppy Frog Game</h1>
-                
+
+                {/* dice */}
+
                 <div className=' bg-orange-100 rounded-xl p-4 w-full flex flex-col items-center gap-2 '>
                     <img
                         src={diceimg}
@@ -599,10 +639,12 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
                     </button>
                 </div>
 
+
+                {/* players */}
                 <div className='w-full flex gap-2 items-center justify-center'>
                     {cleanedplayerlist.map((player, i) => (
                         player.length > 0 &&
-                        <div key={i} className={`p-4 rounded-xl text-sm border-2 ${cleanedplayerlist[currentplayerindex] === player ? 'bg-yellow-300' : ''} `}>
+                        <div key={i} className={`p-4 rounded-xl relative text-sm border-2 ${cleanedplayerlist[currentplayerindex] === player ? 'bg-yellow-300' : ''} `}>
                             <div className='flex flex-col gap-2 items-center font-semibold'>
                                 {player}
                                 <span className='font-normal'>{scores[i]}</span>
@@ -610,6 +652,17 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
                                     src={`frog-${i}.png`}
                                     className='w-[25px] object-contain '
                                 />
+                            </div>
+
+                            {/* {playerrank.indexOf(player) + 1} */}
+                            <div className=' absolute -top-2 right-0 h-10 '>
+                                {playerrank.indexOf(player) > -1 ? (
+                                    /* what you want to show */
+                                    <img
+                                        className='w-6 object-contain'
+                                        src={`badge_${playerrank.indexOf(player) + 1}.png`} />
+
+                                ) : null}
                             </div>
                         </div>
 
@@ -633,35 +686,103 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
 
                     </div>
                 </div>
-                <p>Developed by ATREE Communications</p>
+                <p className='text-center '>Developed by ATREE Communications</p>
             </div>
 
+
+
+
+
+
+
+
+
+
+
+
             {showPopup && (
-                <div className="modal-overlay h-full absolute  inset-0 flex items-center justify-center">
+                <div className={`modal-overlay h-full absolute  inset-0  items-center justify-center p-2 ${show_congratualtions ? 'hidden' : ' flex'}`}>
                     <div className='h-full  w-full absolute  inset-0 flex items-center justify-center bg-black opacity-50 z-5'></div>
 
 
-                    <div className={` w-auto max-w-1/3 h-auto flex  gap-2 p-4 rounded-xl ${conatainerstyle} z-10`}>
+                     <div className={`  w-1/2 lg:max-w-1/3 h-auto flex flex-col lg:flex-row items-center  gap-4 p-4 rounded-xl ${conatainerstyle} z-10`}>
                         <img
                             src={alertimg} className='h-[200px] object-conatin' />
                         <div className='flex flex-col gap-2 '>
                             <p className="font-semibold text-center">{alertdesc}</p>
-                            <button onClick={() => { Setshowresult(true) }} className={`p-2 bg-[#be7b17] text-white rounded-xl animate-bounce m-5 ${showreload?'hidden':'flex'}  ${showresult ? 'hidden' : 'flex flex-col'}`}>Check what happend</button>
+                            <button onClick={() => { Setshowresult(true) }} className={`p-2 bg-[#be7b17] text-white rounded-xl animate-bounce m-5 ${showreload ? 'hidden' : 'flex'}  ${showresult ? 'hidden' : 'flex flex-col'}`}>Check what happend</button>
 
                             <div className={`${showresult ? 'flex flex-col' : 'hidden'}  w-full  gap-2 items-center justify-center`}>
 
                                 <p className="font-semibold border-2 p-2 bg-[#d1b07e] uppercase text-center rounded-xl animate-bounce">{alertmessage}</p>
-                                <button className={` ${showreload?'hidden':'flex'}  p-2 px-4 bg-[#be7b17] text-white rounded-xl  m-5`} onClick={popupOkHandler}>{popuptext}</button>
-                               
+                                <button className={` ${showreload ? 'hidden' : 'flex'}  p-2 px-4 bg-[#be7b17] text-white rounded-xl  m-5`} onClick={popupOkHandler}>{popuptext}</button>
+
                             </div>
 
-                            <div className={`${showreload?'flex flex-col':'hidden'}  w-full  gap-2 items-center justify-center`}>
-                                 <button className={` p-2 px-4 bg-[#be7b17] text-white rounded-xl  m-5`} onClick={reload}>{popuptext}</button>
+                            <div className={`${showreload ? 'flex flex-col' : 'hidden'}  w-full  gap-2 items-center justify-center`}>
+                                <button className={` p-2 px-4 bg-[#be7b17] text-white rounded-xl  m-5`} onClick={reload}>{popuptext}</button>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
+
+
+            {show_congratualtions && <div className="modal-overlay h-full absolute  inset-0 flex items-center justify-center p-2">
+                <div className='h-full  w-full absolute  inset-0 flex items-center justify-center bg-black opacity-50 z-5'>
+                    <img
+                        src='/poprain.gif'
+                        className="w-full h-full object-contain"
+                    />
+                </div>
+                <div className={`  w-1/2 lg:max-w-1/3 h-auto flex flex-col lg:flex-col items-center  gap-4 p-4 rounded-xl ${conatainerstyle} z-10`}>
+                    <h1 className="font-extrabold text-xl md:text-2xl uppercase">congratulations</h1>
+                    <img
+                        src='/frogicon.png'
+                        className="w-1/3 object-contain object-center animate-bounce" />
+
+                    <div className='w-full flex gap-2 items-center justify-center'>
+
+                        {cleanedplayerlist.map((player, i) => (
+                            player.length > 0 &&
+                            <div key={i} className={`p-4 relative rounded-xl text-sm border-2 bg-yellow-300 ${cleanedplayerlist[currentplayerindex] === player ? 'bg-yellow-300' : ''} `}>
+                                <div className='flex flex-col gap-2 items-center font-semibold relative'>
+                                    {player}
+                                    <span className='font-normal'>{scores[i]}</span>
+                                    <img
+                                        src={`frog-${i}.png`}
+                                        className='w-[25px] object-contain '
+                                    />
+
+                                    
+                                </div>
+                                <div className=' absolute -top-2 right-0 h-10 '>
+                                        {playerrank.indexOf(player) > -1 ? (
+                                            /* what you want to show */
+                                            <img
+                                                className='w-7 object-contain '
+                                                src={`badge_${playerrank.indexOf(player) + 1}.png`} />
+
+                                        ) : null}
+                                    </div>
+
+                            </div>
+
+                        ))}
+
+
+
+                    </div>
+
+
+                    <button className={` p-2 px-4 bg-[#be7b17] text-white rounded-xl  m-5`} onClick={reload}>Play Again</button>
+
+
+
+                </div>
+            </div>}
+
+
 
 
 
