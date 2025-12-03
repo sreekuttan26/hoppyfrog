@@ -292,8 +292,8 @@ const Gameboard = ({ entroledplayers, changescreen }: probs) => {
         }
         Setisrolling(true)
         Setdiceimg(`/dice.gif`)
-         const dicevalue = Math.floor(Math.random() * 6) + 1;
-       // const dicevalue = 1;
+        const dicevalue = Math.floor(Math.random() * 6) + 1;
+      // const dicevalue = 1;
         Setcurrentdicevalue(dicevalue)
         playdice()
         await new Promise((resolve) => setTimeout(resolve, 3010));
